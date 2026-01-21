@@ -1,55 +1,71 @@
-# Monte-Carlo-Betting-Analysis
-### Stochastic Betting Strategies with Python
+# Monte Carlo Drawdown and Ruin Risk
+### Capital Dynamics and Position Sizing Under Stochastic Returns
 
-This repository is a small research toolkit for simulating and comparing **stochastic betting strategies** under a roulette-like game with a slight house edge (**win probability ≈ 0.49**). This is signifiantly lower than the real-world house edge in roulette or typical fruit machines. The repository focuses on **bankroll dynamics**, **probability of ruin**, and **distributional outcomes** using Monte Carlo simulation. The code is designed to be easily modifed, allowing different variations of house edge, stake and bankroll to be investegated.
+This repository is a small research toolkit for analysing **capital allocation, drawdown risk, and ruin probabilities** under repeated exposure to a stochastic return process with negative expected value.
 
-The project is organized as reusable core logic in `src/` (RNG utilities, strategy implementations, simulation runner, and metrics) plus a short notebook series that explains each strategy and visualizes results.
+Using Monte Carlo simulation, the project studies how different **position sizing and progression rules** affect bankroll dynamics, tail outcomes, and the likelihood of capital depletion. While the underlying model is intentionally simple, the framework is directly applicable to problems in **risk management, stress testing, and capital preservation**, where path dependence and extreme outcomes dominate long-run behaviour.
+
+The code is designed to be easily modified, allowing parameters such as return distribution, edge, position sizing rules, and initial capital to be varied for scenario analysis.
+
+The project is organised as reusable core logic in `src/` (random number generation, strategy implementations, simulation runner, and metrics) alongside a short notebook series that explains each strategy and visualises results.
 
 ---
 
 ## Project Overview
 
-Progression systems can “feel” profitable because they often produce many small wins — until a losing streak creates a large drawdown or total ruin. This repo explores that trade-off by simulating strategies under identical assumptions and measuring:
+Many exposure-scaling or progression rules can appear attractive because they often produce frequent small gains. However, these same rules may embed **severe tail risk**, where rare adverse sequences lead to large drawdowns or total capital depletion.
 
-- **Ruin probability** (how often bankroll hits zero / busts)
-- **Final bankroll distributions** (skew, tails, dispersion)
-- **Mean vs median outcomes** (typical vs “average” results)
+This repository explores that trade-off by simulating different position sizing approaches under identical assumptions and measuring:
 
-### Strategies covered
+- **Ruin probability** (frequency of total capital depletion)
+- **Final capital distributions** (skewness, tails, dispersion)
+- **Mean vs median outcomes** (average vs typical realised results)
+- **Path dependence and drawdown behaviour**
 
-| Strategy | Rule | Intuition | Main risk |
+The emphasis is on understanding how **risk accumulates over time**, rather than on short-horizon performance.
+
+---
+
+## Position Sizing Rules Studied
+
+| Rule | Description | Intuition | Primary Risk |
 |:--|:--|:--|:--|
-| **Simple / Flat** | Bet a constant stake each round | Baseline reference model | Slow drift under negative EV |
-| **Martingale** | Double after each loss; reset after a win | “Recover losses quickly” | Exponential stake growth → bankroll blowups |
-| **D’Alembert** | Increase stake by 1 unit after loss; decrease by 1 after win | “Smoother recovery” | Still negative EV; ruin remains possible |
+| **Constant position size** | Fixed exposure per iteration | Baseline reference model | Gradual capital decay under negative drift |
+| **Exponential scaling** | Increase exposure after losses; reset after gains | Short-term variance suppression | Rare but catastrophic drawdowns |
+| **Linear scaling** | Increment exposure after losses; decrement after gains | Smoother exposure adjustment | Persistent tail risk |
+
+All rules are evaluated under identical return assumptions to isolate the effect of position sizing on risk and capital dynamics.
 
 ---
 
 ## Notebook Series
 
-All notebooks include narrative explanation plus plots from both **single-path** and **Monte Carlo** simulations.
+Each notebook combines narrative explanation with plots from both **single-path** simulations and **Monte Carlo** experiments.
 
 | # | Notebook | Focus |
 |:--|:--|:--|
-| 01 | [`01_simple_bettor.ipynb`](notebooks/01_simple_bettor.ipynb) | Baseline flat betting + bankroll evolution + Monte Carlo outcome distribution |
-| 02 | [`02_martingale_bettor.ipynb`](notebooks/02_martingale_bettor.ipynb) | Martingale dynamics (many small gains vs occasional large losses) + ruin behavior |
-| 03 | [`03_d’alembert_bettor.ipynb`](notebooks/03_d’alembert_bettor.ipynb) | Linear progression variant + comparison to Martingale-style variance |
-| 04 | [`04_strategy_comparison.ipynb`](notebooks/04_strategy_comparison.ipynb) | Head-to-head Monte Carlo comparison: ruin rate + distributions + mean/median outcomes |
+| 01 | `01_constant_position_size.ipynb` | Baseline exposure rule, capital evolution, and outcome distributions |
+| 02 | `02_exponential_position_scaling.ipynb` | Short-term gains vs tail risk and ruin behaviour |
+| 03 | `03_linear_position_scaling.ipynb` | Linear adjustment rule and comparison of drawdown profiles |
+| 04 | `04_strategy_comparison.ipynb` | Head-to-head Monte Carlo comparison of ruin rates and outcome distributions |
 
-The comparison notebook evaluates all three strategies under identical parameters and summarizes **ruin rate** and final-wealth statistics.
+The final comparison notebook evaluates all strategies under identical parameters and summarises **ruin probability** and final-capital statistics.
 
 ---
 
 ## Repository Structure
 
-- `notebooks/` — walkthrough notebooks (strategy-by-strategy + final comparison)
+- `notebooks/` — walkthrough notebooks (rule-by-rule analysis and final comparison)
 - `src/` — reusable simulation code
-  - `rng.py` — seeding + roulette-like trial helper
-  - `runner.py` — Monte Carlo runner (`run_simulation`)
-  - `metrics.py` — summary / reporting helpers
-  - `strategies/` — strategy implementations (simple, martingale, d’alembert)
+  - `rng.py` — random number generation utilities
+  - `runner.py` — Monte Carlo simulation runner
+  - `metrics.py` — summary statistics and reporting helpers
+  - `strategies/` — position sizing rule implementations
 - `tests/` — unit tests for core logic (where applicable)
 
 ---
 
+## Notes
+
+Although inspired by classical probability problems, the focus of this project is on **risk management and capital preservation**, rather than recreational gambling or game-based analysis. The techniques demonstrated here are directly transferable to domains such as trading risk, portfolio stress testing, and scenario-based capital analysis.
 
